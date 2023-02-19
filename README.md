@@ -1,4 +1,4 @@
-* Test case for job application. (will write company name later)
+# Test case for job application. (will write company name later)
 
 К сожалению, не смог приблизиться к 25мс - максимум 44мс на моей системе.
 

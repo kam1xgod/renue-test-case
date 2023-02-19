@@ -7,6 +7,15 @@ public class App {
     MainController mc = new MainController();
 
     mc.mainTask(args);
+
+    // the thing is - there are some values containing comma.
+    // need to think about it.
+
+
+    // also can rewrite code for searching.
+
+
+
     // on start - open file, count lines.
     // take 25% of it and work with first batch.
     // stream through batch, find every row that matches pattern.

@@ -1,16 +1,23 @@
 package com.kami.testcase.service;
 
-import com.kami.testcase.model.Row;
-import com.kami.testcase.model.SearchOptions;
+import com.kami.testcase.model.Element;
+
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Scanner;
 
+@RequiredArgsConstructor
 public class UIServiceImpl implements UIService {
 
-  // private TrackerService trackerService = new TrackerServiceImpl();
   private Scanner s = new Scanner(System.in);
   // better to write some method for counting it, but for now this looks ok.
   private static final int AMOUNT_OF_COLS = 14;
+  private final TrackerService trackerService;
+
+  public UIServiceImpl() {
+    this.trackerService = new TrackerServiceImpl();
+  }
 
   @Override
   public int parseArgs(String[] args) throws NumberFormatException {
@@ -31,15 +38,19 @@ public class UIServiceImpl implements UIService {
   }
 
   @Override
-  public void printResult(List<Row> rows, SearchOptions opt, Long ms) {
-    rows.forEach(r -> System.out.println(r.getFieldByIndex() + r.toString()));
-    printMeasurements(rows, ms);
+  public void printResult(List<Element> rows, List<String> strs) {
+    int strIndex = 0;
+    for (Element row : rows) {
+      System.out.println(row.getColWord() + "[" + strs.get(strIndex) + "]");
+      strIndex++;
+    }
+    printMeasurements(rows);
   }
 
   @Override
-  public void printMeasurements(List<Row> rows, Long ms) {
+  public void printMeasurements(List<Element> rows) {
     StringBuilder sb = new StringBuilder();
-    sb.append("Found: ").append(rows.size()).append(" rows and ").append(ms).append("ms");
+    sb.append("Found: ").append(rows.size()).append(" rows in ").append(trackerService.calcTime()).append("ms");
     System.out.println(sb.toString());
   }
 

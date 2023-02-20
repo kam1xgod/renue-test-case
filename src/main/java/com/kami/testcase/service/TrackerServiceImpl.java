@@ -1,31 +1,24 @@
 package com.kami.testcase.service;
 
-// import java.time.Duration;
-// import java.time.Instant;
-// import java.time.temporal.ChronoUnit;
-//
-// import org.apache.commons.lang3.time.StopWatch;
+import java.time.Duration;
+import java.time.Instant;
 
-@Deprecated
 public class TrackerServiceImpl implements TrackerService {
-  // private StopWatch sw = new StopWatch();
-  // private Instant start;
-  // private Instant finish;
-  private Long start;
-  private Long finish;
+  private static Instant start;
+  private static Instant finish;
 
   @Override
   public void startTimeTracking() {
-    start = System.nanoTime();
+    start = Instant.now();
   }
 
   @Override
   public void finishTimeTracking() {
-    finish = System.nanoTime();
+    finish = Instant.now();
   }
 
   @Override
   public Long calcTime() {
-    return finish - start;
+    return Duration.between(start, finish).toMillis();
   }
 }

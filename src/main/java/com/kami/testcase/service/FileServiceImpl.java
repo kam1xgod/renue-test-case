@@ -1,64 +1,52 @@
 package com.kami.testcase.service;
 
-import com.kami.testcase.model.Row;
-import com.kami.testcase.model.SearchOptions;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+
+import com.kami.testcase.model.Element;
+import com.kami.testcase.model.SearchOptions;
+
+import lombok.Getter;
 
 public class FileServiceImpl implements FileService {
-  private FileInputStream inputStream = null;
-  private BufferedReader bufferedReader = null;
+  private FileInputStream inputStream;
+  @Getter
+  private BufferedReader bufferedReader;
   private static final String path = "../airports.csv";
-  private Map<SearchOptions, List<Row>> memo = new HashMap<>();
-
-  // private TrackerService trackerService = new TrackerServiceImpl();
-  private UIService uiService = new UIServiceImpl();
-  // private MatchingService matchingService = new MatchingServiceImpl();
+  private SearchService searchService = new SearchServiceImpl();
 
   @Override
-  public void openFile() throws FileNotFoundException {
-    inputStream = new FileInputStream(path);
+  public BufferedReader openFile() throws FileNotFoundException {
     inputStream = new FileInputStream(path);
     bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+    return bufferedReader;
   }
 
   @Override
-  public List<Row> scanBatch(SearchOptions opt) {
-    if (memo.containsKey(opt)) {
-      return memo.get(opt);
-    }
-    List<Row> matchedRows = new ArrayList<>();
-    Stream<String> linesStream = bufferedReader.lines();
-    linesStream
-        .filter(
-            r ->
-                r.split(",")[opt.getSearchCol()].startsWith("\"")
-                    ? r.split(",")[opt.getSearchCol()]
-                        .substring(1)
-                        .startsWith(opt.getSearchPattern())
-                    : r.split(",")[opt.getSearchCol()].startsWith(opt.getSearchPattern()))
-        .forEach(r -> matchedRows.add(Row.of(r, opt.getSearchCol())));
-    Collections.sort(matchedRows);
-    memo.put(opt, matchedRows);
-    return matchedRows;
+  public void closeFile() throws IOException {
+    inputStream.close();
+    bufferedReader.close();
   }
 
   @Override
-  public void scanFile(SearchOptions opt) throws FileNotFoundException {
-    Instant start = Instant.now();
-    openFile();
-    scanBatch(opt);
-    Instant finish = Instant.now();
-    uiService.printResult(memo.get(opt), opt, Duration.between(start, finish).toMillis());
+  public List<Element> readFileOnce(SearchOptions so) throws IOException {
+    List<Element> batch = searchService.searchColsInFile(bufferedReader, so);
+    resetBufReader();
+    return batch;
+  }
+
+  @Override
+  public String getDataFromFile(long beforeRow) throws IOException {
+    return searchService.searchInFile(bufferedReader, beforeRow);
+  }
+
+  @Override
+  public void resetBufReader() throws IOException {
+    inputStream.getChannel().position(0);
+    bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
   }
 }

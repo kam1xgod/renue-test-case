@@ -39,7 +39,6 @@ public class SearchServiceImpl implements SearchService {
 
   @Override
   public List<Element> searchInBatch(List<Element> batch, SearchOptions so) {
-    start = Instant.now();
     List<Element> matchedRows = new ArrayList<>();
 
     batch.stream()
@@ -53,8 +52,6 @@ public class SearchServiceImpl implements SearchService {
             r -> {
               matchedRows.add(r);
             });
-
-    finish = Instant.now();
 
     return matchedRows;
   }

@@ -10,14 +10,12 @@ import com.kami.testcase.service.TrackerService;
 import com.kami.testcase.service.TrackerServiceImpl;
 import com.kami.testcase.service.UIService;
 import com.kami.testcase.service.UIServiceImpl;
-
-import lombok.RequiredArgsConstructor;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class MainController {
@@ -36,19 +34,16 @@ public class MainController {
 
   public void mainTask(String[] args) {
     try {
+      int gotArgs = uiService.parseArgs(args);
       fileService.openFile();
       String choice = uiService.parseQueue();
       while (!choice.equals("!quit")) {
-        SearchOptions so = new SearchOptions(uiService.parseArgs(args), choice);
-
+        SearchOptions so = new SearchOptions(gotArgs, choice);
         batch = fileService.readFileOnce(so);
-
         trackerService.startTimeTracking();
-
         List<Element> matchedRows = new ArrayList<>();
         matchedRows = searchService.searchInBatch(batch, so);
         Collections.sort(matchedRows);
-
         trackerService.finishTimeTracking();
 
         List<String> strs = new ArrayList<>();
@@ -74,7 +69,7 @@ public class MainController {
       fileService.closeFile();
       uiService.closeScanner();
     } catch (NumberFormatException numExc) {
-      System.err.println("Input one number bigger than 0 and lower than 14.");
+      System.err.println("Input one number bigger than 0 and lower than 14 as an argument.");
       System.exit(1);
     } catch (FileNotFoundException fileExc) {
       System.err.println("Make sure .csv file placed in project's root directory.");

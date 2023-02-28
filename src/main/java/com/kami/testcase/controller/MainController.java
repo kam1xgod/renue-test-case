@@ -37,9 +37,9 @@ public class MainController {
       int gotArgs = uiService.parseArgs(args);
       fileService.openFile();
       String choice = uiService.parseQueue();
+      SearchOptions so = new SearchOptions(gotArgs, choice);
+      batch = fileService.readFileOnce(so);
       while (!choice.equals("!quit")) {
-        SearchOptions so = new SearchOptions(gotArgs, choice);
-        batch = fileService.readFileOnce(so);
         trackerService.startTimeTracking();
         List<Element> matchedRows = new ArrayList<>();
         matchedRows = searchService.searchInBatch(batch, so);
@@ -64,6 +64,7 @@ public class MainController {
         fileService.resetBufReader();
 
         choice = uiService.parseQueue();
+        so.setSearchPattern(choice);
       }
 
       fileService.closeFile();
